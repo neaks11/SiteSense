@@ -198,12 +198,15 @@ export const useDealVault = () => {
     logActivity(`Saved assumption profile: ${name}`);
   };
 
-  const savedRows = Object.entries(saved as Record<string, SavedDeal>).map(([key, item]) => {
-    const site = siteLookup[item.siteId];
-    const model = modelDeal(getDefaultAssumptions(site));
-    const dealScore = scoreDeal(site, model, 50);
-    return { key, item, site, model, dealScore };
-  });
+  const savedRows = Object.entries(saved as Record<string, SavedDeal>)
+    .map(([key, item]) => {
+      const site = siteLookup[item.siteId];
+      if (!site) return null;
+      const model = modelDeal(getDefaultAssumptions(site));
+      const dealScore = scoreDeal(site, model, 50);
+      return { key, item, site, model, dealScore };
+    })
+    .filter((row): row is { key: string; item: SavedDeal; site: (typeof sites)[number]; model: ReturnType<typeof modelDeal>; dealScore: ReturnType<typeof scoreDeal> } => row !== null);
 
   const recentSites = recentlyViewed.map((id: string) => siteLookup[id]).filter(Boolean);
 

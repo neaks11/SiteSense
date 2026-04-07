@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Map, { Marker, NavigationControl, Popup } from 'react-map-gl';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import Papa from 'papaparse';
@@ -41,6 +42,7 @@ import { SensitivityControls } from './dashboard/SensitivityControls';
 import { SmartWarnings } from './dashboard/SmartWarnings';
 import { StrategyPersonaSelector } from './dashboard/StrategyPersonaSelector';
 import { TopDealsPanel } from './dashboard/TopDealsPanel';
+import { SimulationPanel } from './dashboard/SimulationPanel';
 
 const fmt = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
 
@@ -62,6 +64,7 @@ const defaultFilters: Filters = {
 const sortOptions = ['Highest score', 'Lowest price', 'Highest projected ROI', 'Lowest risk', 'Fastest timeline'] as const;
 
 export const DashboardView = () => {
+  const navigate = useNavigate();
   const [filters, setFilters] = useState(defaultFilters);
   const [selected, setSelected] = useState<SiteRecord>(sites[0]);
   const [showHotZones, setShowHotZones] = useState(true);
@@ -117,14 +120,14 @@ export const DashboardView = () => {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 's') save(selected.id);
-      if (e.key.toLowerCase() === 'c') window.location.hash = '#/compare';
+      if (e.key.toLowerCase() === 'c') navigate('/compare');
       if (e.key.toLowerCase() === 'p') setPitchMode((v) => !v);
       if (e.key.toLowerCase() === 'd') setDarkMode(!darkMode);
       if (e.key.toLowerCase() === 'u') duplicate(selected.id);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [darkMode, duplicate, save, selected.id, setDarkMode]);
+  }, [darkMode, duplicate, save, selected.id, setDarkMode, navigate]);
 
   const scoredRows = useMemo(() => {
     return sites.map((site) => {
@@ -362,7 +365,7 @@ export const DashboardView = () => {
                 <select className="rounded border p-1" value={saved[selected.id]?.status ?? 'New'} onChange={(e) => setStatus(selected.id, e.target.value as PipelineStatus)}>
                   <option>New</option><option>Reviewing</option><option>Underwriting</option><option>Contacted</option><option>Offered</option><option>Dead</option><option>Closed</option>
                 </select>
-                <select className="rounded border p-1" value={saved[selected.id]?.scenarioLabel ?? 'Base Case'} onChange={(e) => setScenarioLabel(selected.id, e.target.value as never)}>
+                <select className="rounded border p-1" value={saved[selected.id]?.scenarioLabel ?? 'Base Case'} onChange={(e) => setScenarioLabel(selected.id, e.target.value as 'Base Case' | 'Stretch Case' | 'Stress Test' | 'Bank Case' | 'Sell Case')}>
                   <option>Base Case</option><option>Stretch Case</option><option>Stress Test</option><option>Bank Case</option><option>Sell Case</option>
                 </select>
               </div>
@@ -440,6 +443,7 @@ export const DashboardView = () => {
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <NeighborhoodSummary rows={neighborhoods} />
         <LocalActivityFeed items={activityFeed} />
+        <SimulationPanel />
       </div>
     </div>
   );
