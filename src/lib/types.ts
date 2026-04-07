@@ -48,16 +48,19 @@ export type Filters = {
   minROI: number;
 };
 
-export type ExitStrategy = 'Hold' | 'Sell';
-export type CapitalType = 'Financed' | 'Cash';
-export type Persona = 'Beginner Investor' | 'Developer' | 'Cash Flow Buyer';
+export type ExitStrategy = 'Flip' | 'Hold' | 'Refinance and Hold' | 'Sell to Operator';
+export type CapitalType = 'Loan' | 'Cash';
+export type Persona = 'Beginner Investor' | 'Developer' | 'Cash Flow Buyer' | 'Value Add Buyer' | 'Conservative Underwriter';
+export type DealTag = 'High Potential' | 'Risky' | 'Revisit' | 'Hold for Later' | 'Favorite Submarket' | '';
+export type PipelineStatus = 'New' | 'Reviewing' | 'Underwriting' | 'Contacted' | 'Offered' | 'Dead' | 'Closed';
 
 export type DealScoreWeights = {
-  landBasis: number;
+  purchasePrice: number;
+  developmentCost: number;
   rentPotential: number;
-  location: number;
-  growth: number;
-  strategyFit: number;
+  neighborhood: number;
+  risk: number;
+  timeline: number;
 };
 
 export type BuildAssumptions = {
@@ -75,13 +78,45 @@ export type BuildAssumptions = {
   operatingExpensePct: number;
   loanToCost: number;
   interestRate: number;
+  loanTermYears: number;
+  interestOnly: boolean;
   timelineMonths: number;
   exitStrategy: ExitStrategy;
   capitalType: CapitalType;
+  exitPriceVariance: number;
+};
+
+export type Sensitivity = {
+  rentVariance: number;
+  costVariance: number;
+  exitVariance: number;
+  vacancyVariance: number;
 };
 
 export type StructuredNote = {
-  strategy: string;
+  investmentThesis: string;
   risks: string;
-  nextSteps: string;
+  nextStep: string;
+  contactStatus: string;
+  offerStrategy: string;
+};
+
+export type SavedView = {
+  id: string;
+  name: string;
+  filters: Filters;
+  persona: Persona;
+  scoreWeights: DealScoreWeights;
+};
+
+export type AssumptionProfile = {
+  id: string;
+  name: string;
+  assumptions: BuildAssumptions;
+};
+
+export type ActivityItem = {
+  id: string;
+  timestamp: number;
+  message: string;
 };

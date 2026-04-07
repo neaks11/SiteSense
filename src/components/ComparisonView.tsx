@@ -8,8 +8,8 @@ export const ComparisonView = () => {
   return (
     <section className="panel overflow-hidden">
       <div className="border-b bg-stone-50 px-4 py-3">
-        <h2 className="text-xl font-semibold">Opportunity Comparison</h2>
-        <p className="text-sm text-stone-600">Compare underwriting outputs side-by-side.</p>
+        <h2 className="text-xl font-semibold">Scenario Comparison</h2>
+        <p className="text-sm text-stone-600">Compare multiple saved opportunities and scenario versions side-by-side.</p>
       </div>
       {savedRows.length ? (
         <div className="overflow-auto">
@@ -22,28 +22,32 @@ export const ComparisonView = () => {
                 <th className="px-4 py-3">NOI</th>
                 <th className="px-4 py-3">Cash Flow</th>
                 <th className="px-4 py-3">DealScore™</th>
-                <th className="px-4 py-3">Best Use</th>
+                <th className="px-4 py-3">ROI</th>
+                <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Tag</th>
+                <th className="px-4 py-3">Scenario</th>
               </tr>
             </thead>
             <tbody>
-              {savedRows.map(({ key, item, site, financials, dealScore }) => (
+              {savedRows.map(({ key, item, site, model, dealScore }) => (
                 <tr key={key} className="border-t">
                   <td className="px-4 py-3 font-medium">{site.address}</td>
                   <td className="px-4 py-3">{site.neighborhood}</td>
-                  <td className="px-4 py-3">{money(financials.totalProjectCost)}</td>
-                  <td className="px-4 py-3">{money(financials.annualNOI)}</td>
-                  <td className="px-4 py-3">{money(financials.annualCashFlow)}</td>
+                  <td className="px-4 py-3">{money(model.totalProjectCost)}</td>
+                  <td className="px-4 py-3">{money(model.annualNOI)}</td>
+                  <td className="px-4 py-3">{money(model.annualCashFlow)}</td>
                   <td className="px-4 py-3">{dealScore.score}</td>
-                  <td className="px-4 py-3">{site.suggestedUse}</td>
-                  <td className="px-4 py-3">{item.tag || "—"}</td>
+                  <td className="px-4 py-3">{model.roiPct.toFixed(1)}%</td>
+                  <td className="px-4 py-3">{item.status}</td>
+                  <td className="px-4 py-3">{item.tag || '—'}</td>
+                  <td className="px-4 py-3">{item.scenarioLabel}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       ) : (
-        <p className="p-6 text-sm text-stone-600">No saved deals yet. Save at least one opportunity to compare.</p>
+        <p className="p-6 text-sm text-stone-600">No comparisons yet. Save a few deals (and duplicates) to compare scenarios.</p>
       )}
     </section>
   );

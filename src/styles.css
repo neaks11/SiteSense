@@ -16,3 +16,13 @@ body {
 .panel {
   @apply rounded-2xl border border-stone-200 bg-white shadow-card;
 }
+
+@media print {
+  header, nav {
+    display: none !important;
+  }
+  .printable .panel {
+    box-shadow: none;
+    border-color: #ddd;
+  }
+}

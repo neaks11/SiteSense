@@ -2,19 +2,24 @@
 
 SiteSense is a production-style proptech MVP focused on **Chicago land intelligence**, modular/affordable development underwriting, and portfolio-style deal analysis.
 
-## What is included
+## Major upgrade set
 
-- SignalMap™ dashboard with Chicago-centered mapping, Smart Filters, and HotZones™ overlays.
-- Scenario Presets, Unit Mix Templates, Exit Strategy toggle, Cash-vs-Financing toggle, and timeline carrying costs.
-- Editable DealScore™ weights + strategy personas for custom investment logic.
-- Sensitivity slider (rent/cost stress test), confidence meter, and separate risk score.
-- “Why NOT build here?” counter-case, auto strategy label, deal story generator, and pro next-step guidance.
-- Deal Pitch Mode with investor-friendly big-number snapshot.
-- DealVault™ saved opportunities with favorites, structured notes, tags, and duplicate deal support.
-- Recently viewed list and Top 5 deal highlights.
-- ReturnLens™ ROI summary with cost-vs-value chart.
-- CSV export for selected deal and clean PDF export stub.
-- Mock dataset with 24 Chicago land opportunities + neighborhood strategic metadata.
+This build now includes a full **frontend-only intelligence workstation** with 50 requested UX/analysis upgrades:
+
+- Scenario presets (Conservative, Aggressive, Section 8, Value Add, Premium Rental)
+- Editable DealScore weights and strategy personas
+- Multi-axis sensitivity controls (rent, cost, exit, vacancy)
+- Exit strategy + financing toggles (loan %, rate, term, IO)
+- Risk analysis card (cost/rent/timeline/neighborhood/exit)
+- Confidence meter + Why-Not-Build section
+- Unit mix templates (2/3/4/6 unit, townhome, small mixed-use)
+- Timeline carrying costs + break-even outputs
+- Top deals, search, sort controls, filter presets, saved custom views
+- Scenario duplicate support + scenario labels
+- Structured notes, tags, pipeline status, recommendation history
+- Local activity feed, guided review checklist, printable summary mode
+- Score explanation drawer, smart warning banners, neighborhood summary cards
+- Pitch mode investor summary, profit waterfall chart, improved CSV/PDF export screen flow
 
 ## Tech Stack
 
@@ -22,7 +27,7 @@ SiteSense is a production-style proptech MVP focused on **Chicago land intellige
 - Tailwind CSS
 - Recharts
 - react-map-gl (Mapbox)
-- Papaparse for CSV export
+- Papaparse
 
 ## Local run
 
@@ -35,39 +40,13 @@ Open `http://localhost:5173`.
 
 ### Optional map setup
 
-To enable live Mapbox tiles:
-
 1. Copy `.env.example` to `.env`
 2. Set `VITE_MAPBOX_TOKEN`
 3. Restart `npm run dev`
 
-Without a token, SignalMap™ shows a branded fallback canvas while all filtering/scoring logic still works.
+Without a token, the map panel falls back to a branded placeholder while app logic still works.
 
-## Suggested real data integrations (next step)
+## Notes
 
-- **Chicago City-Owned Lots / land inventory**: Chicago Data Portal (Socrata API)
-- **Cook County parcel and ownership**: Cook County Assessor / Recorder data feeds
-- **Zoning and land use**: Chicago zoning datasets + zoning map APIs
-- **Rents / demand**: HUD fair market rent + private comps APIs (Rentometer, CoStar, MLS feeds)
-- **Transit access**: CTA GTFS/station feeds or Google Places transit matrices
-- **Construction costs**: RSMeans or internal GC bid database
-
-## Folder structure
-
-```text
-src/
-  components/
-    ComparisonView.tsx
-    DashboardView.tsx
-    DealContext.tsx
-    SavedDealsView.tsx
-  data/
-    sites.ts
-  lib/
-    finance.ts
-    store.ts
-    types.ts
-  App.tsx
-  main.tsx
-  styles.css
-```
+- No backend/API calls were introduced.
+- State is persisted in `localStorage` for dashboard/user workflow continuity.
