@@ -20,6 +20,7 @@ This build now includes a full **frontend-only intelligence workstation** with 5
 - Local activity feed, guided review checklist, printable summary mode
 - Score explanation drawer, smart warning banners, neighborhood summary cards
 - Pitch mode investor summary, profit waterfall chart, improved CSV/PDF export screen flow
+- Phase 1 add-ons: One-Glance IC Memo, scenario tabs (Base/Bank/Stretch/Stress), delta chips, diligence completeness, and prioritized warning severities
 
 ## Tech Stack
 

@@ -201,13 +201,15 @@ export const getWhyNot = (site: SiteRecord, m: ReturnType<typeof modelDeal>, ris
 ];
 
 export const warningBanners = (m: ReturnType<typeof modelDeal>, risk: number, sensitivity: Sensitivity) => {
-  const warnings: string[] = [];
-  if (m.roiPct < 6) warnings.push('Margin too thin for current assumptions.');
-  if (m.carryingCost > 60000) warnings.push('Timeline too long; carrying cost is high.');
-  if (Math.abs(sensitivity.rentVariance) > 14 || Math.abs(sensitivity.costVariance) > 14) warnings.push('Sensitivity stress is high; outputs are unstable.');
-  if (risk > 70) warnings.push('Risk score elevated; require deeper diligence.');
-  if (m.financingCost > m.annualNOI * 0.75) warnings.push('Financing stress is high vs NOI.');
-  return warnings;
+  const warnings: { level: 'Critical' | 'Material' | 'Watchlist'; text: string }[] = [];
+  if (m.roiPct < 6) warnings.push({ level: 'Critical', text: 'Margin too thin for current assumptions.' });
+  if (m.carryingCost > 60000) warnings.push({ level: 'Material', text: 'Timeline too long; carrying cost is high.' });
+  if (Math.abs(sensitivity.rentVariance) > 14 || Math.abs(sensitivity.costVariance) > 14) warnings.push({ level: 'Material', text: 'Sensitivity stress is high; outputs are unstable.' });
+  if (risk > 70) warnings.push({ level: 'Critical', text: 'Risk score elevated; require deeper diligence.' });
+  if (m.financingCost > m.annualNOI * 0.75) warnings.push({ level: 'Watchlist', text: 'Financing stress is high vs NOI.' });
+
+  const rank = { Critical: 0, Material: 1, Watchlist: 2 };
+  return warnings.sort((a, b) => rank[a.level] - rank[b.level]);
 };
 
 export const statusColor = (status: PipelineStatus) => ({

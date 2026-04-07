@@ -23,6 +23,8 @@ import { useDeals } from './DealContext';
 import { CostBreakdownCard } from './dashboard/CostBreakdownCard';
 import { DealPitchView } from './dashboard/DealPitchView';
 import { DealScoreWeightsCard } from './dashboard/DealScoreWeights';
+import { DeltaMetric } from './dashboard/DeltaMetric';
+import { ICMemoCard } from './dashboard/ICMemoCard';
 import { FilterPresets } from './dashboard/FilterPresets';
 import { GuidedChecklist } from './dashboard/GuidedChecklist';
 import { LayoutToggle } from './dashboard/LayoutToggle';
@@ -72,6 +74,13 @@ export const DashboardView = () => {
   const [showPrintable, setShowPrintable] = useState(false);
   const [checklist, setChecklist] = useState<string[]>([]);
   const [recommendationHistory, setRecommendationHistory] = useState<string[]>([]);
+  const [scenarioBook, setScenarioBook] = useState<Record<string, BuildAssumptions>>({
+    'Base Case': getDefaultAssumptions(sites[0]),
+    'Bank Case': getDefaultAssumptions(sites[0]),
+    'Stretch Case': getDefaultAssumptions(sites[0]),
+    'Stress Test': getDefaultAssumptions(sites[0]),
+  });
+  const [activeScenario, setActiveScenario] = useState<keyof typeof scenarioBook>('Base Case');
 
   const {
     save,
@@ -155,11 +164,13 @@ export const DashboardView = () => {
 
   const topDeals = filtered.slice(0, 5).map((r) => ({ site: r.site, score: r.score.score }));
   const selectedRow = scoredRows.find((x) => x.site.id === selected.id) ?? scoredRows[0];
+  const baselineModel = modelDeal(getDefaultAssumptions(selected), defaultSensitivity);
   const recommendation = getRecommendation(selectedRow.score.score, selectedRow.model.roiPct, selectedRow.risk.score, selectedPersona);
   const confidence = getConfidence(sensitivity, selectedRow.score.score, selectedRow.risk.score);
   const whyNot = getWhyNot(selected, selectedRow.model, selectedRow.risk.score);
   const warnings = warningBanners(selectedRow.model, selectedRow.risk.score, sensitivity);
   const story = dealStory(selected, recommendation, selectedRow.model, selectedRow.risk.score);
+  const diligenceCompleteness = Math.round(((checklist.length / 8) * 70) + ((saved[selected.id]?.note?.investmentThesis ? 1 : 0) * 30));
 
   useEffect(() => {
     const msg = `${new Date().toLocaleTimeString()} · ${recommendation.stance} (${recommendation.bestFit})`;
@@ -214,7 +225,15 @@ export const DashboardView = () => {
 
   const onSelect = (site: SiteRecord) => {
     setSelected(site);
-    setAssumptions(getDefaultAssumptions(site));
+    const base = getDefaultAssumptions(site);
+    setAssumptions(base);
+    setScenarioBook({
+      'Base Case': base,
+      'Bank Case': base,
+      'Stretch Case': base,
+      'Stress Test': base,
+    });
+    setActiveScenario('Base Case');
   };
 
   return (
@@ -292,6 +311,14 @@ export const DashboardView = () => {
 
           <aside className="sticky top-3 space-y-4 self-start">
             <section className="panel p-4">
+              <div className="mb-2 flex flex-wrap gap-2">
+                {(Object.keys(scenarioBook) as (keyof typeof scenarioBook)[]).map((name) => (
+                  <button key={name} className={`rounded-full border px-2 py-1 text-xs ${activeScenario === name ? 'bg-brand-700 text-white' : ''}`} onClick={() => { setActiveScenario(name); setAssumptions(scenarioBook[name]); }}>
+                    {name}
+                  </button>
+                ))}
+                <button className="rounded-full border px-2 py-1 text-xs" onClick={() => setScenarioBook((prev) => ({ ...prev, [activeScenario]: assumptions }))}>Save to scenario</button>
+              </div>
               <div className="mb-2 flex items-center justify-between">
                 <h3 className="text-lg font-semibold">Deal Detail Panel</h3>
                 <span className={`rounded-full px-3 py-1 text-xs font-semibold ${selectedRow.score.score >= 80 ? 'bg-emerald-100 text-emerald-700' : selectedRow.score.score >= 60 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>DealScore™ {selectedRow.score.score}</span>
@@ -342,6 +369,11 @@ export const DashboardView = () => {
             </section>
 
             <section className="panel p-4 text-sm">
+              <div className="mb-2 grid grid-cols-3 gap-2">
+                <DeltaMetric label="DealScore" value={selectedRow.score.score} prev={scoreDeal(selected, baselineModel, selectedRow.risk.score, scoreWeights).score} />
+                <DeltaMetric label="ROI %" value={selectedRow.model.roiPct} prev={baselineModel.roiPct} />
+                <DeltaMetric label="Risk" value={selectedRow.risk.score} prev={getRiskBreakdown(selected, baselineModel).score} />
+              </div>
               <h3 className="font-semibold">ReturnLens™</h3>
               <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
                 <p>Total Cost <span className="block font-semibold">{fmt(selectedRow.model.totalProjectCost)}</span></p>
@@ -365,6 +397,7 @@ export const DashboardView = () => {
               </div>
             </section>
 
+            <ICMemoCard thesis={story} bearCase={`If rents drop 10%, projected cash flow weakens quickly.`} risks={whyNot} recommendation={`${recommendation.stance} · ${recommendation.bestFit}`} completeness={diligenceCompleteness} />
             <CostBreakdownCard m={selectedRow.model} />
             <RiskAnalysisCard risk={{ score: selectedRow.risk.score, buckets: selectedRow.risk.buckets as Record<string, string> }} />
             <ScoreExplanationDrawer components={selectedRow.score.components as Record<string, number>} />
