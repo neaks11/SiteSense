@@ -7,6 +7,7 @@ import {
   defaultSensitivity,
   dealStory,
   getConfidence,
+  getConfidenceBands,
   getDefaultAssumptions,
   getRecommendation,
   getRiskBreakdown,
@@ -105,6 +106,8 @@ export const DashboardView = () => {
     setStatus,
     setScenarioLabel,
     logActivity,
+    addDecisionSnapshot,
+    markForShare,
   } = useDeals();
 
   useEffect(() => {
@@ -170,6 +173,7 @@ export const DashboardView = () => {
   const whyNot = getWhyNot(selected, selectedRow.model, selectedRow.risk.score);
   const warnings = warningBanners(selectedRow.model, selectedRow.risk.score, sensitivity);
   const story = dealStory(selected, recommendation, selectedRow.model, selectedRow.risk.score);
+  const bands = getConfidenceBands(selectedRow.model);
   const diligenceCompleteness = Math.round(((checklist.length / 8) * 70) + ((saved[selected.id]?.note?.investmentThesis ? 1 : 0) * 30));
 
   const playbook = ({
@@ -336,6 +340,7 @@ export const DashboardView = () => {
               </div>
               <p className="font-medium">{selected.address}</p>
               <p className="text-sm text-stone-600">Confidence: {confidence} · Risk: {selectedRow.risk.score}/100</p>
+              <p className="mt-1 text-xs text-brand-700">Operator DNA: {recommendation.operatorDNA}</p>
               <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
                 <p>Asking <span className="block font-semibold">{fmt(selected.landPrice)}</span></p>
                 <p>Lot <span className="block font-semibold">{selected.lotSqft} sqft</span></p>
@@ -348,6 +353,10 @@ export const DashboardView = () => {
                 <button className="rounded-lg border px-3 py-2 text-xs" onClick={() => toggleFavorite(selected.id)}>{saved[selected.id]?.favorite ? '★' : '☆'}</button>
                 <button className="rounded-lg border px-3 py-2 text-xs" onClick={exportCSV}>Export CSV</button>
                 <button className="rounded-lg border px-3 py-2 text-xs" onClick={() => window.print()}>PDF Export Screen</button>
+                <button className="rounded-lg border px-3 py-2 text-xs" onClick={() => {
+                  addDecisionSnapshot({ key: selected.id, score: selectedRow.score.score, roi: selectedRow.model.roiPct, risk: selectedRow.risk.score, recommendation: `${recommendation.stance} · ${recommendation.bestFit}` });
+                }}>Snapshot decision</button>
+                <button className="rounded-lg border px-3 py-2 text-xs" onClick={() => markForShare(selected.id)}>Mark for share packet</button>
               </div>
               <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
                 <select className="rounded border p-1" value={saved[selected.id]?.status ?? 'New'} onChange={(e) => setStatus(selected.id, e.target.value as PipelineStatus)}>
@@ -395,6 +404,8 @@ export const DashboardView = () => {
                 <p>Break-even Exit <span className="block font-semibold">{fmt(selectedRow.model.breakEvenExit)}</span></p>
                 <p>Max All-in Cost <span className="block font-semibold">{fmt(selectedRow.model.maxAllInCost)}</span></p>
                 <p>ROI <span className="block font-semibold">{selectedRow.model.roiPct.toFixed(1)}%</span></p>
+                <p>NOI Band <span className="block font-semibold">{fmt(bands.noiLow)} - {fmt(bands.noiHigh)}</span></p>
+                <p>Value Band <span className="block font-semibold">{fmt(bands.valueLow)} - {fmt(bands.valueHigh)}</span></p>
               </div>
               <div className="mt-2 h-28">
                 <ResponsiveContainer width="100%" height="100%">

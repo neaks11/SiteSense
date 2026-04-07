@@ -187,8 +187,24 @@ export const getConfidence = (sensitivity: Sensitivity, score: number, risk: num
 export const getRecommendation = (score: number, roi: number, risk: number, persona: Persona) => {
   const stance = score > 80 && risk < 50 && roi > 10 ? 'Bullish' : score > 62 && roi > 4 ? 'Cautious' : 'Pass';
   const bestFit = roi > 13 ? 'Best for quick flip' : roi > 8 && risk < 60 ? 'Best for rental hold' : risk > 70 ? 'Too thin to pursue' : 'Best for value-add';
-  const voice = persona === 'Conservative Underwriter' ? 'Protect downside first.' : 'Prioritize execution speed and basis control.';
-  return { stance, bestFit, voice };
+  const voice = persona === 'Conservative Underwriter'
+    ? 'Protect downside first.'
+    : persona === 'Value Add Buyer'
+      ? 'Lean into repositioning upside with tight execution controls.'
+      : persona === 'Cash Flow Buyer'
+        ? 'Prioritize durable NOI and downside cash-flow resilience.'
+        : 'Prioritize execution speed and basis control.';
+
+  const operatorDNA =
+    persona === 'Conservative Underwriter'
+      ? 'Underwrite to downside rent and longer timeline before committing.'
+      : persona === 'Value Add Buyer'
+        ? 'Target transitional submarkets with clear rent lift catalysts.'
+        : persona === 'Cash Flow Buyer'
+          ? 'Prefer stable demand corridors and lower volatility exits.'
+          : 'Balance growth optionality with construction discipline.';
+
+  return { stance, bestFit, voice, operatorDNA };
 };
 
 export const dealStory = (site: SiteRecord, rec: ReturnType<typeof getRecommendation>, m: ReturnType<typeof modelDeal>, risk: number) =>
@@ -221,3 +237,13 @@ export const statusColor = (status: PipelineStatus) => ({
   Dead: 'bg-rose-100 text-rose-700',
   Closed: 'bg-emerald-100 text-emerald-700',
 }[status]);
+
+
+export const getConfidenceBands = (m: ReturnType<typeof modelDeal>) => ({
+  noiLow: m.annualNOI * 0.88,
+  noiHigh: m.annualNOI * 1.12,
+  valueLow: m.stabilizedValue * 0.9,
+  valueHigh: m.stabilizedValue * 1.1,
+  spreadLow: m.developmentSpread * 0.82,
+  spreadHigh: m.developmentSpread * 1.18,
+});

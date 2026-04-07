@@ -3,6 +3,7 @@ import { ComparisonView } from './components/ComparisonView';
 import { DashboardView } from './components/DashboardView';
 import { SavedDealsView } from './components/SavedDealsView';
 import { PortfolioView } from './components/PortfolioView';
+import { SharePacketView } from './components/SharePacketView';
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
               ['/saved', 'DealVault™'],
               ['/compare', 'Compare'],
               ['/portfolio', 'Portfolio'],
+              ['/share', 'Share Packet'],
             ].map(([to, label]) => (
               <NavLink
                 key={to}
@@ -42,6 +44,7 @@ export default function App() {
           <Route path="/saved" element={<SavedDealsView />} />
           <Route path="/compare" element={<ComparisonView />} />
           <Route path="/portfolio" element={<PortfolioView />} />
+          <Route path="/share" element={<SharePacketView />} />
         </Routes>
       </main>
     </div>

@@ -127,3 +127,13 @@ export type PortfolioConfig = {
   maxRisk: number;
   targetHoldPct: number;
 };
+
+export type DecisionSnapshot = {
+  id: string;
+  key: string;
+  timestamp: number;
+  score: number;
+  roi: number;
+  risk: number;
+  recommendation: string;
+};

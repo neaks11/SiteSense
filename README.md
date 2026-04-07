@@ -22,6 +22,7 @@ This build now includes a full **frontend-only intelligence workstation** with 5
 - Pitch mode investor summary, profit waterfall chart, improved CSV/PDF export screen flow
 - Phase 1 add-ons: One-Glance IC Memo, scenario tabs (Base/Bank/Stretch/Stress), delta chips, diligence completeness, and prioritized warning severities
 - Phase 2 add-ons: Portfolio constructor, allocator assistant, stage-based execution playbooks, and blended portfolio analytics
+- Phase 3 add-ons: Operator-DNA recommendation language, decision snapshot replay, confidence bands, and shareable investor packet route
 
 ## Tech Stack
 

@@ -12,6 +12,7 @@ import type {
   SavedView,
   StructuredNote,
   PortfolioConfig,
+  DecisionSnapshot,
 } from './types';
 
 export type SavedDeal = {
@@ -46,6 +47,8 @@ type PersistedState = {
   filterPresets: SavedView[];
   portfolio: string[];
   portfolioConfig: PortfolioConfig;
+  decisionSnapshots: DecisionSnapshot[];
+  shareDealKey: string | null;
 };
 
 export const useDealVault = () => {
@@ -60,6 +63,8 @@ export const useDealVault = () => {
   const [scoreWeights, setScoreWeights] = useState<DealScoreWeights>(defaultWeights);
   const [portfolio, setPortfolio] = useState<string[]>([]);
   const [portfolioConfig, setPortfolioConfig] = useState<PortfolioConfig>({ budget: 1200000, maxRisk: 65, targetHoldPct: 60 });
+  const [decisionSnapshots, setDecisionSnapshots] = useState<DecisionSnapshot[]>([]);
+  const [shareDealKey, setShareDealKey] = useState<string | null>(null);
 
   const siteLookup = useMemo(() => Object.fromEntries(sites.map((s) => [s.id, s])), []);
 
@@ -79,6 +84,8 @@ export const useDealVault = () => {
       setScoreWeights(parsed.scoreWeights ?? defaultWeights);
       setPortfolio(parsed.portfolio ?? []);
       setPortfolioConfig(parsed.portfolioConfig ?? { budget: 1200000, maxRisk: 65, targetHoldPct: 60 });
+      setDecisionSnapshots(parsed.decisionSnapshots ?? []);
+      setShareDealKey(parsed.shareDealKey ?? null);
     } catch {
       // ignore local parse issues
     }
@@ -106,9 +113,11 @@ export const useDealVault = () => {
       filterPresets,
       portfolio,
       portfolioConfig,
+      decisionSnapshots,
+      shareDealKey,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-  }, [saved, recentlyViewed, activityFeed, darkMode, compactMode, savedViews, savedAssumptionProfiles, selectedPersona, scoreWeights, portfolio, portfolioConfig]);
+  }, [saved, recentlyViewed, activityFeed, darkMode, compactMode, savedViews, savedAssumptionProfiles, selectedPersona, scoreWeights, portfolio, portfolioConfig, decisionSnapshots, shareDealKey]);
 
   const logActivity = (message: string) => {
     setActivityFeed((prev: ActivityItem[]) => [{ id: `${Date.now()}`, timestamp: Date.now(), message }, ...prev].slice(0, 40));
@@ -170,6 +179,19 @@ export const useDealVault = () => {
     setPortfolio((prev: string[]) => prev.filter((id) => id !== key));
   };
 
+
+  const addDecisionSnapshot = (snapshot: Omit<DecisionSnapshot, 'id' | 'timestamp'>) => {
+    setDecisionSnapshots((prev: DecisionSnapshot[]) => [
+      { ...snapshot, id: `snap-${Date.now()}`, timestamp: Date.now() },
+      ...prev,
+    ].slice(0, 40));
+    logActivity(`Snapshotted decision for ${snapshot.key}`);
+  };
+
+  const markForShare = (key: string) => {
+    setShareDealKey(key);
+  };
+
   const addAssumptionProfile = (name: string, assumptions: ReturnType<typeof getDefaultAssumptions>) => {
     const id = `profile-${Date.now()}`;
     setSavedAssumptionProfiles((prev: AssumptionProfile[]) => [{ id, name, assumptions }, ...prev].slice(0, 12));
@@ -223,6 +245,10 @@ export const useDealVault = () => {
     portfolioRows,
     addToPortfolio,
     removeFromPortfolio,
+    decisionSnapshots,
+    addDecisionSnapshot,
+    shareDealKey,
+    markForShare,
     logActivity,
   };
 };
