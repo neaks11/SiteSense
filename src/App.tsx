@@ -2,6 +2,7 @@ import { NavLink, Route, Routes } from 'react-router-dom';
 import { ComparisonView } from './components/ComparisonView';
 import { DashboardView } from './components/DashboardView';
 import { SavedDealsView } from './components/SavedDealsView';
+import { PortfolioView } from './components/PortfolioView';
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
               ['/', 'SignalMap™'],
               ['/saved', 'DealVault™'],
               ['/compare', 'Compare'],
+              ['/portfolio', 'Portfolio'],
             ].map(([to, label]) => (
               <NavLink
                 key={to}
@@ -39,6 +41,7 @@ export default function App() {
           <Route path="/" element={<DashboardView />} />
           <Route path="/saved" element={<SavedDealsView />} />
           <Route path="/compare" element={<ComparisonView />} />
+          <Route path="/portfolio" element={<PortfolioView />} />
         </Routes>
       </main>
     </div>

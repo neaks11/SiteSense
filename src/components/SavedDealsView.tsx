@@ -5,7 +5,7 @@ import { useDeals } from './DealContext';
 const money = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
 
 export const SavedDealsView = () => {
-  const { savedRows, toggleFavorite, setTag, setNote, setStatus } = useDeals();
+  const { savedRows, toggleFavorite, setTag, setNote, setStatus, addToPortfolio } = useDeals();
 
   if (!savedRows.length) {
     return (
@@ -44,6 +44,7 @@ export const SavedDealsView = () => {
           </div>
 
           <div className="mt-2 flex flex-wrap gap-2">
+            <button className="rounded-lg border px-2 py-1 text-xs" onClick={() => addToPortfolio(key)}>Add to Portfolio</button>
             <select className="rounded-lg border p-2 text-sm" value={item.tag} onChange={(e) => setTag(key, e.target.value as DealTag)}>
               <option value="">No tag</option>
               <option>High Potential</option><option>Risky</option><option>Revisit</option><option>Hold for Later</option><option>Favorite Submarket</option>

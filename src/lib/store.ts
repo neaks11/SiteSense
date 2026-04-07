@@ -11,6 +11,7 @@ import type {
   PipelineStatus,
   SavedView,
   StructuredNote,
+  PortfolioConfig,
 } from './types';
 
 export type SavedDeal = {
@@ -43,6 +44,8 @@ type PersistedState = {
   selectedPersona: Persona;
   scoreWeights: DealScoreWeights;
   filterPresets: SavedView[];
+  portfolio: string[];
+  portfolioConfig: PortfolioConfig;
 };
 
 export const useDealVault = () => {
@@ -55,6 +58,8 @@ export const useDealVault = () => {
   const [savedAssumptionProfiles, setSavedAssumptionProfiles] = useState<AssumptionProfile[]>([]);
   const [selectedPersona, setSelectedPersona] = useState<Persona>('Developer');
   const [scoreWeights, setScoreWeights] = useState<DealScoreWeights>(defaultWeights);
+  const [portfolio, setPortfolio] = useState<string[]>([]);
+  const [portfolioConfig, setPortfolioConfig] = useState<PortfolioConfig>({ budget: 1200000, maxRisk: 65, targetHoldPct: 60 });
 
   const siteLookup = useMemo(() => Object.fromEntries(sites.map((s) => [s.id, s])), []);
 
@@ -72,6 +77,8 @@ export const useDealVault = () => {
       setSavedAssumptionProfiles(parsed.savedAssumptionProfiles ?? []);
       setSelectedPersona(parsed.selectedPersona ?? 'Developer');
       setScoreWeights(parsed.scoreWeights ?? defaultWeights);
+      setPortfolio(parsed.portfolio ?? []);
+      setPortfolioConfig(parsed.portfolioConfig ?? { budget: 1200000, maxRisk: 65, targetHoldPct: 60 });
     } catch {
       // ignore local parse issues
     }
@@ -97,9 +104,11 @@ export const useDealVault = () => {
       selectedPersona,
       scoreWeights,
       filterPresets,
+      portfolio,
+      portfolioConfig,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-  }, [saved, recentlyViewed, activityFeed, darkMode, compactMode, savedViews, savedAssumptionProfiles, selectedPersona, scoreWeights]);
+  }, [saved, recentlyViewed, activityFeed, darkMode, compactMode, savedViews, savedAssumptionProfiles, selectedPersona, scoreWeights, portfolio, portfolioConfig]);
 
   const logActivity = (message: string) => {
     setActivityFeed((prev: ActivityItem[]) => [{ id: `${Date.now()}`, timestamp: Date.now(), message }, ...prev].slice(0, 40));
@@ -151,6 +160,16 @@ export const useDealVault = () => {
     logActivity(`Saved dashboard view: ${name}`);
   };
 
+
+  const addToPortfolio = (key: string) => {
+    setPortfolio((prev: string[]) => (prev.includes(key) ? prev : [...prev, key]));
+    logActivity(`Added ${key} to portfolio`);
+  };
+
+  const removeFromPortfolio = (key: string) => {
+    setPortfolio((prev: string[]) => prev.filter((id) => id !== key));
+  };
+
   const addAssumptionProfile = (name: string, assumptions: ReturnType<typeof getDefaultAssumptions>) => {
     const id = `profile-${Date.now()}`;
     setSavedAssumptionProfiles((prev: AssumptionProfile[]) => [{ id, name, assumptions }, ...prev].slice(0, 12));
@@ -165,6 +184,13 @@ export const useDealVault = () => {
   });
 
   const recentSites = recentlyViewed.map((id: string) => siteLookup[id]).filter(Boolean);
+
+  const portfolioRows = portfolio
+    .map((key: string) => {
+      const row = savedRows.find((r) => r.key === key) ?? savedRows.find((r) => r.site.id === key);
+      return row ? { key: row.key, item: row.item, site: row.site, model: row.model, dealScore: row.dealScore } : null;
+    })
+    .filter((row: { key: string; item: SavedDeal; site: (typeof sites)[number]; model: ReturnType<typeof modelDeal>; dealScore: ReturnType<typeof scoreDeal> } | null): row is { key: string; item: SavedDeal; site: (typeof sites)[number]; model: ReturnType<typeof modelDeal>; dealScore: ReturnType<typeof scoreDeal> } => row !== null);
 
   return {
     saved,
@@ -191,6 +217,12 @@ export const useDealVault = () => {
     setSelectedPersona,
     scoreWeights,
     setScoreWeights,
+    portfolio,
+    portfolioConfig,
+    setPortfolioConfig,
+    portfolioRows,
+    addToPortfolio,
+    removeFromPortfolio,
     logActivity,
   };
 };

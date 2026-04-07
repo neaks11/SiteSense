@@ -172,6 +172,17 @@ export const DashboardView = () => {
   const story = dealStory(selected, recommendation, selectedRow.model, selectedRow.risk.score);
   const diligenceCompleteness = Math.round(((checklist.length / 8) * 70) + ((saved[selected.id]?.note?.investmentThesis ? 1 : 0) * 30));
 
+  const playbook = ({
+    New: ['Pull parcel comps', 'Check zoning envelope', 'Set baseline assumptions'],
+    Reviewing: ['Validate rent comps', 'Call 2 GCs for rough pricing', 'Set go/no-go guardrails'],
+    Underwriting: ['Stress-test downside case', 'Review financing terms', 'Draft IC memo'],
+    Contacted: ['Confirm seller timeline', 'Verify title/encumbrances', 'Request survey if available'],
+    Offered: ['Draft contingencies', 'Model revised basis', 'Prep attorney handoff'],
+    Dead: ['Archive lessons learned', 'Tag rejection reason', 'Reallocate budget to top alternatives'],
+    Closed: ['Kick off predevelopment checklist', 'Lock design + permits', 'Track monthly variance'],
+  } as const)[(saved[selected.id]?.status ?? 'New') as PipelineStatus];
+
+
   useEffect(() => {
     const msg = `${new Date().toLocaleTimeString()} · ${recommendation.stance} (${recommendation.bestFit})`;
     setRecommendationHistory((prev) => [msg, ...prev.filter((p) => p !== msg)].slice(0, 12));
@@ -398,6 +409,12 @@ export const DashboardView = () => {
             </section>
 
             <ICMemoCard thesis={story} bearCase={`If rents drop 10%, projected cash flow weakens quickly.`} risks={whyNot} recommendation={`${recommendation.stance} · ${recommendation.bestFit}`} completeness={diligenceCompleteness} />
+            <section className="panel p-4 text-xs">
+              <h3 className="font-semibold">Execution Playbook</h3>
+              <ul className="mt-2 list-disc space-y-1 pl-5">
+                {playbook.map((step) => <li key={step}>{step}</li>)}
+              </ul>
+            </section>
             <CostBreakdownCard m={selectedRow.model} />
             <RiskAnalysisCard risk={{ score: selectedRow.risk.score, buckets: selectedRow.risk.buckets as Record<string, string> }} />
             <ScoreExplanationDrawer components={selectedRow.score.components as Record<string, number>} />

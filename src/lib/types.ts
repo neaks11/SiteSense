@@ -120,3 +120,10 @@ export type ActivityItem = {
   timestamp: number;
   message: string;
 };
+
+
+export type PortfolioConfig = {
+  budget: number;
+  maxRisk: number;
+  targetHoldPct: number;
+};
