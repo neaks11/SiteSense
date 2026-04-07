@@ -48,6 +48,18 @@ export type Filters = {
   minROI: number;
 };
 
+export type ExitStrategy = 'Hold' | 'Sell';
+export type CapitalType = 'Financed' | 'Cash';
+export type Persona = 'Beginner Investor' | 'Developer' | 'Cash Flow Buyer';
+
+export type DealScoreWeights = {
+  landBasis: number;
+  rentPotential: number;
+  location: number;
+  growth: number;
+  strategyFit: number;
+};
+
 export type BuildAssumptions = {
   landPurchasePrice: number;
   closingCosts: number;
@@ -63,4 +75,13 @@ export type BuildAssumptions = {
   operatingExpensePct: number;
   loanToCost: number;
   interestRate: number;
+  timelineMonths: number;
+  exitStrategy: ExitStrategy;
+  capitalType: CapitalType;
+};
+
+export type StructuredNote = {
+  strategy: string;
+  risks: string;
+  nextSteps: string;
 };

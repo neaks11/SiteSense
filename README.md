@@ -5,13 +5,14 @@ SiteSense is a production-style proptech MVP focused on **Chicago land intellige
 ## What is included
 
 - SignalMap™ dashboard with Chicago-centered mapping, Smart Filters, and HotZones™ overlays.
-- Deal Detail Panel with property intelligence + rule-based recommendation.
-- BuildIQ™ development calculator with editable assumptions and full underwriting outputs.
-- ReturnLens™ ROI summary with compact cost-vs-value chart.
-- DealScore™ weighted scoring engine + short reasoning.
-- AI-style recommendation section: **Would SiteSense build here?**
-- DealVault™ saved opportunities with favorites and notes.
-- Comparison table for saved opportunities.
+- Scenario Presets, Unit Mix Templates, Exit Strategy toggle, Cash-vs-Financing toggle, and timeline carrying costs.
+- Editable DealScore™ weights + strategy personas for custom investment logic.
+- Sensitivity slider (rent/cost stress test), confidence meter, and separate risk score.
+- “Why NOT build here?” counter-case, auto strategy label, deal story generator, and pro next-step guidance.
+- Deal Pitch Mode with investor-friendly big-number snapshot.
+- DealVault™ saved opportunities with favorites, structured notes, tags, and duplicate deal support.
+- Recently viewed list and Top 5 deal highlights.
+- ReturnLens™ ROI summary with cost-vs-value chart.
 - CSV export for selected deal and clean PDF export stub.
 - Mock dataset with 24 Chicago land opportunities + neighborhood strategic metadata.
 

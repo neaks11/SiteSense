@@ -23,11 +23,12 @@ export const ComparisonView = () => {
                 <th className="px-4 py-3">Cash Flow</th>
                 <th className="px-4 py-3">DealScore™</th>
                 <th className="px-4 py-3">Best Use</th>
+                <th className="px-4 py-3">Tag</th>
               </tr>
             </thead>
             <tbody>
-              {savedRows.map(({ site, financials, dealScore }) => (
-                <tr key={site.id} className="border-t">
+              {savedRows.map(({ key, item, site, financials, dealScore }) => (
+                <tr key={key} className="border-t">
                   <td className="px-4 py-3 font-medium">{site.address}</td>
                   <td className="px-4 py-3">{site.neighborhood}</td>
                   <td className="px-4 py-3">{money(financials.totalProjectCost)}</td>
@@ -35,6 +36,7 @@ export const ComparisonView = () => {
                   <td className="px-4 py-3">{money(financials.annualCashFlow)}</td>
                   <td className="px-4 py-3">{dealScore.score}</td>
                   <td className="px-4 py-3">{site.suggestedUse}</td>
+                  <td className="px-4 py-3">{item.tag || "—"}</td>
                 </tr>
               ))}
             </tbody>
